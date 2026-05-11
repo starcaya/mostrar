@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ARCHIVO "productos.dat"
+
+// Estructura del producto
+typedef struct {
+    int codigo;
+    float precio;
+    char descripcion[51]; // 50 caracteres + '\0'
+} Producto;
+
+/*
+---------------------------------------------------------
+Función: mostrarProductos
+Descripción:
+Lee el archivo binario productos.dat y muestra
+todos los registros en pantalla.
+---------------------------------------------------------
+*/
+void mostrarProductos(const char *nombreArchivo) {
+    FILE *archivo;
+    Producto prod;
+
+    // Abrir archivo en modo lectura binaria
+    archivo = fopen(nombreArchivo, "rb");
+
+    if (archivo == NULL) {
+        printf("Error: No se pudo abrir el archivo %s\n", nombreArchivo);
+        return;
+    }
+
+    printf("=== LISTADO DE PRODUCTOS ===\n\n");
+
+    // Leer registro por registro
+    while (fread(&prod, sizeof(Producto), 1, archivo) == 1) {
+        printf("Codigo: %d\n", prod.codigo);
+        printf("Precio: %.2f\n", prod.precio);
+        printf("Descripcion: %s\n", prod.descripcion);
+        printf("-----------------------------\n");
+    }
+
+    fclose(archivo);
+}
+
+int main() {
+    mostrarProductos(ARCHIVO);
+    return 0;
+}
