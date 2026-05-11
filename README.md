@@ -1,0 +1,2 @@
+# mostrar
+muestra archivo 
