@@ -47,3 +47,60 @@ int main() {
     mostrarProductos(ARCHIVO);
     return 0;
 }
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ARCHIVO "productos.dat"
+
+typedef struct {
+    int codigo;
+    float precio;
+    char descripcion[51];
+} Producto;
+
+/*
+---------------------------------------------------------
+Función: aumentarPrecios
+Descripción:
+Abre el archivo binario en modo lectura/escritura,
+lee cada producto, aumenta el precio un 10%
+y lo vuelve a guardar en la misma posición.
+---------------------------------------------------------
+*/
+void aumentarPrecios(const char *nombreArchivo) {
+    FILE *fp;
+    Producto prod;
+
+    // rb+ = lectura y escritura binaria sin borrar contenido
+    fp = fopen(nombreArchivo, "rb+");
+
+    if (fp == NULL) {
+        printf("Error al abrir el archivo.\n");
+        return;
+    }
+
+    while (fread(&prod, sizeof(Producto), 1, fp) == 1) {
+
+        // Aumentar 10%
+        prod.precio = prod.precio * 1.10;
+
+        /*
+        Después de leer, el puntero quedó al final del registro.
+        Retrocedemos una posición para sobrescribir ese mismo producto.
+        */
+        fseek(fp, -sizeof(Producto), SEEK_CUR);
+
+        // Escribir registro modificado
+        fwrite(&prod, sizeof(Producto), 1, fp);
+
+        /*
+        Algunos compiladores/bibliotecas requieren esto
+        al cambiar de escribir -> leer en archivos update (rb+)
+        */
+        fseek(fp, 0, SEEK_CUR);
+    }
+
+    fclose(fp);
+
+    printf("Precios actualizados con 10%% de aumento.\n");
+}
